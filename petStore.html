@@ -31,7 +31,7 @@
                 <img v-bind:src="product.image">
               </figure>
             </div>
-            <div class="col-md-6 col-md-offset-2 description">
+            <div class="col-md-6 col-md-offset-3 description">
               <h1 v-text="product.title"></h1>
               <p v-html="product.description"></p>
               <p class="price">
@@ -42,6 +42,23 @@
                 v-if="canAddToCart">Add to cart</button>
                 <button disabled="true" class=" btn btn-primary btn-lg"
                   v-else >Add to cart</button>
+                  <span class ="inventory-message"
+                  v-if="product.availableInventory - cartItemCount === 0">All Out!
+                </span>
+                <span class = "inventory-message"
+                  v-else-if="product.availableInventory - cartItemCount < 5">
+                Only {{product.availableInventory - cartItemCount}} left!
+              </span>
+              <span class = "inventory-message"
+              v-else>Buy Now!</span>
+              <div class ="rating">
+                <span v-bind:class="{'rating-active': checkRating(n)}"
+                  v-for="n in 5">☆</span>
+                  <!--
+                    showing star rating
+                    value of active rating determined by checkRating
+                  -->
+              </div>
             </div>
           </div>
           <div v-else>
@@ -80,9 +97,9 @@
                         <strong>State:</strong>
                         <select v-model="order.state" class="form-control">
                           <option disabled value="">State</option>
-                          <option v-for="(state, key) in states" v-bind:value="state">
-                            {{key}}
-                          </option>
+                          <option v-for="(state, key) in states"
+                          v-bind:value="state">{{key}}</option>
+                         
                         </select>
                       </div>
                     </div>
@@ -94,6 +111,7 @@
                           type="number"/>
                       </div>
                     </div>
+
     
                     <div class="form-group">
                       <div class="col-md-6 boxes">
@@ -121,7 +139,7 @@
                     </div>
                     <div class="form-group">
                       <div class="col-md-6">
-                        <button type="submit" class="btn btn-primary submit" v-on:click="submitForm">Place Order</button>
+                        <button type="submit" class="btn btn-primary submit" >Place Order</button>
                       </div>
                     </div>
                     <div class="col-md-12 verify">
@@ -161,19 +179,30 @@
                     city: '',
                     zip: '',
                     state: '',
-                    method: 'Home',
-                    gift: false
+                    method: 'Home Address',
+                    business: 'Business Address',
+                    home: 'Home Address',
+                    gift: 'Send As A Gift',
+                    sendGift: 'Send As A Gift',
+                    dontSendGift: 'Do Not Send As A Gift'
                 },
                 product:{
                     id:1001,
                     title:"Cat Food, 25lb bag",
                     description: "A 25 pound bag of <em>irresistible</em>,"+	
-                  "organic goodness for your cat.",
+                  "organic goodness for your cat.", 
                     price:2000,
                     image: "cat-wont-eat.jpg",
-                    availableInventory: 5
+                    availableInventory: 10,
+                    rating: 3
                 },
-                cart:[]
+                cart:[],
+                states:{
+                    AL: 'Alabama',
+                    AR: 'Arizona',
+                    CA: 'California',
+                    NV: 'Nevada'
+                }
             },
             filters: {
                 formatPrice: function(price){
@@ -193,6 +222,9 @@
                 }
             },
             methods:{
+                checkRating(n){
+                  return this.product.rating - n >=0;
+                },
                 addToCart: function(){
                     this.cart.push(this.product.id);
                    
